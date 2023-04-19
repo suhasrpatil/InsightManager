@@ -6,9 +6,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="insightmanagertest" />
         <module name="InsightManager 2" />
+        <module name="insightmanagertest" />
         <module name="IM TestModule" />
+        <module name="insightmanager" />
       </profile>
     </annotationProcessing>
   </component>
