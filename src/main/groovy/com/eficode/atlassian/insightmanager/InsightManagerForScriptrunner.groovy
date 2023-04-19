@@ -693,7 +693,7 @@ class InsightManagerForScriptrunner {
 
 
             attributeValueMap.clone().each { Map.Entry map ->
-                sleep(1000)
+                //sleep(1000)
                 if (map.value == null || map.value == []) {
                     clearObjectAttribute(objectBean, map.key)
                 } else {
