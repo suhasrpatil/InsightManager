@@ -677,10 +677,10 @@ class InsightManagerForScriptrunner {
      *
      * @return Returns and array of the new/updated ObjectAttributeBean
      */
-    ArrayList<ObjectAttributeBean> updateObjectAttributes(def object, Map attributeValueMap) {
+    ObjectBean updateObjectAttributes(def object, Map attributeValueMap) {
 
         log.info("Updating ${attributeValueMap.size()} Object $object attributes")
-
+        ObjectBean savedObjectBean
 
         ObjectBean objectBean = getObjectBean(object)
         MutableObjectBean mutableObject = objectBean.createMutable()
@@ -756,6 +756,8 @@ class InsightManagerForScriptrunner {
             }
 
             mutableObject.setObjectAttributeBeans(newObjectAttributeBeans)
+            savedObjectBean = objectFacade.storeObjectBean(mutableObject, this.eventDispatchOption)
+
             log.info("Successfully updated attributes")
 
         } catch (all) {
@@ -768,7 +770,7 @@ class InsightManagerForScriptrunner {
         }
 
 
-        return newObjectAttributeBeans
+        return savedObjectBean
 
     }
 
