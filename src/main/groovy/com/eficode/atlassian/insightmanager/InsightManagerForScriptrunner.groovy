@@ -739,7 +739,6 @@ class InsightManagerForScriptrunner {
 
                            //ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
 
-
                         if (newAttributeBean != null) {
                             newObjectAttributeBeans.add(newAttributeBean)
                             log.info("Attribute Successfully added to bean.")
@@ -756,10 +755,8 @@ class InsightManagerForScriptrunner {
             }
 
             mutableObject.setObjectAttributeBeans(newObjectAttributeBeans)
-            sleep(100)
             objectFacade.storeObjectBean(mutableObject, this.eventDispatchOption)
-
-            log.info("Successfully updated attributes")
+            log.info("Successfully updated object attributes")
 
         } catch (all) {
             log.error("\tError updating object attribute:" + all.message)
