@@ -683,7 +683,6 @@ class InsightManagerForScriptrunner {
         ObjectBean savedObjectBean
 
         ObjectBean objectBean = getObjectBean(object)
-        MutableObjectBean mutableObject = objectBean.createMutable()
 
         ArrayList<ObjectAttributeBean> newObjectAttributeBeans = []
 
@@ -740,7 +739,7 @@ class InsightManagerForScriptrunner {
                            //ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
 
                         if (newAttributeBean != null) {
-                            newObjectAttributeBeans.add(newAttributeBean)
+                            newObjectAttributeBeans.add(newObjectAttributeBean)
                             log.info("Successfully updated attribute")
 
                         } else {
@@ -754,9 +753,6 @@ class InsightManagerForScriptrunner {
 
             }
 
-            mutableObject.setObjectAttributeBeans(newObjectAttributeBeans)
-            objectFacade.storeObjectBean(mutableObject, this.eventDispatchOption)
-            log.info("Successfully updated object attributes")
 
         } catch (all) {
             log.error("\tError updating object attribute:" + all.message)
