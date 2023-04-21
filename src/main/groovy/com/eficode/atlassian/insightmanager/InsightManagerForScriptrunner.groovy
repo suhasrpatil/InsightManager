@@ -683,7 +683,6 @@ class InsightManagerForScriptrunner {
         ObjectBean savedObjectBean
 
         ObjectBean objectBean = getObjectBean(object)
-        MutableObjectBean mutableObject = objectBean.createMutable()
 
         ArrayList<ObjectAttributeBean> newObjectAttributeBeans = []
 
@@ -692,13 +691,13 @@ class InsightManagerForScriptrunner {
             log.trace("\tObjectbean:" + objectBean)
 
 
-            attributeValueMap.clone().each { Map.Entry map ->
+            attributeValueMap.each { Map.Entry map ->
                 //sleep(1000)
                 if (map.value == null || map.value == []) {
                     clearObjectAttribute(objectBean, map.key)
                 } else {
 
-                    MutableObjectTypeAttributeBean attributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
+                    MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
 
 
                     MutableObjectAttributeBean newAttributeBean
@@ -711,7 +710,7 @@ class InsightManagerForScriptrunner {
                             map.value = map.value.collect { it.toString() }
                         }
 
-                        newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, attributeBean, *map.value)
+                        newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, *map.value)
 
 
                     } else {
@@ -720,11 +719,11 @@ class InsightManagerForScriptrunner {
                             map.value = map.value.id
                         }
 
-                        newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, attributeBean, map.value as String)
+                        newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, map.value as String)
                     }
 
 
-                    ObjectAttributeBean oldAttributeBean = objectFacade.loadObjectAttributeBean(objectBean.id, attributeBean.id)
+                    ObjectAttributeBean oldAttributeBean = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id)
 
 
                     // If attribute exist reuse the old id for the new attribute
@@ -739,10 +738,9 @@ class InsightManagerForScriptrunner {
 
                            //ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
 
-
                         if (newAttributeBean != null) {
-                            newObjectAttributeBeans.add(newAttributeBean)
-                            log.info("Attribute Successfully added to bean.")
+                            newObjectAttributeBeans.add(newObjectAttributeBean)
+                            log.info("Successfully updated attribute")
 
                         } else {
                             log.error("Failed to update attribute")
@@ -755,11 +753,6 @@ class InsightManagerForScriptrunner {
 
             }
 
-            mutableObject.setObjectAttributeBeans(newObjectAttributeBeans)
-            sleep(100)
-            objectFacade.storeObjectBean(mutableObject, this.eventDispatchOption)
-
-            log.info("Successfully updated attributes")
 
         } catch (all) {
             log.error("\tError updating object attribute:" + all.message)
