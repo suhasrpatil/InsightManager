@@ -680,7 +680,6 @@ class InsightManagerForScriptrunner {
     ArrayList<ObjectAttributeBean> updateObjectAttributes(def object, Map attributeValueMap) {
 
         log.info("Updating ${attributeValueMap.size()} Object $object attributes")
-        ObjectBean savedObjectBean
 
         ObjectBean objectBean = getObjectBean(object)
 
@@ -692,7 +691,6 @@ class InsightManagerForScriptrunner {
 
 
             attributeValueMap.each { Map.Entry map ->
-                //sleep(1000)
                 if (map.value == null || map.value == []) {
                     clearObjectAttribute(objectBean, map.key)
                 } else {
@@ -736,7 +734,8 @@ class InsightManagerForScriptrunner {
                         return null
                     } else {
 
-                           //ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
+                           ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
+
 
                         if (newAttributeBean != null) {
                             newObjectAttributeBeans.add(newObjectAttributeBean)
