@@ -743,7 +743,7 @@ class InsightManagerForScriptrunner {
                     } else {
 
                            ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
-
+                           
 
                         if (newAttributeBean != null) {
                             newObjectAttributeBeans.add(newObjectAttributeBean)
