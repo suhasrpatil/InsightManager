@@ -692,17 +692,13 @@ class InsightManagerForScriptrunner {
 
 
             attributeValueMap.clone().each { Map.Entry map ->
-                MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
-                def oldValue = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id).getObjectAttributeValueBeans()[0].value
-                log.info("OLD value: $oldValue, New Value: ${map.value}")
+
                 if (map.value == null || map.value == []) {
                     clearObjectAttribute(objectBean, map.key)
-                } else if (map.value == oldValue) {
-                    log.info("New attribute value is same as old.")
-                    return
                 } else {
 
-                    //MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
+                    MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
+
 
                     MutableObjectAttributeBean newAttributeBean
                     if (map.value instanceof ArrayList) {
@@ -712,6 +708,13 @@ class InsightManagerForScriptrunner {
                             map.value = map.value.collect { it.id.toString() }
                         } else {
                             map.value = map.value.collect { it.toString() }
+                        }
+
+                        def oldValue = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id).getObjectAttributeValueBeans()[0].value
+                        log.info("OLD value: $oldValue, New Value: ${map.value}")
+                        if (map.value == oldValue.toString()) {
+                            log.info("New attribute value is same as old.")
+                            return
                         }
 
                         newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, *map.value)
