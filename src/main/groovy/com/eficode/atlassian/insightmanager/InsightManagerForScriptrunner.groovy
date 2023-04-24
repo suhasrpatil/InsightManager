@@ -710,12 +710,6 @@ class InsightManagerForScriptrunner {
                             map.value = map.value.collect { it.toString() }
                         }
 
-                        def oldValue = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id).getObjectAttributeValueBeans()[0].value
-                        log.info("OLD value: $oldValue, New Value: ${map.value}")
-                        if (map.value == oldValue.toString()) {
-                            log.info("New attribute value is same as old.")
-                            return
-                        }
 
                         newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, *map.value)
 
@@ -730,7 +724,12 @@ class InsightManagerForScriptrunner {
 
 
                     ObjectAttributeBean oldAttributeBean = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id)
-
+                    def oldValue = oldAttributeBean.getObjectAttributeValueBeans()[0].value
+                    log.trace("OLD value: $oldValue, New Value: ${map.value}")
+                    if (map.value.find().toString() == oldValue.toString()) {
+                        log.info("New attribute value is same as old.")
+                        return
+                    }
 
                     // If attribute exist reuse the old id for the new attribute
                     if (oldAttributeBean != null) {
