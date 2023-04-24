@@ -686,88 +686,90 @@ class InsightManagerForScriptrunner {
 
         ArrayList<ObjectAttributeBean> newObjectAttributeBeans = []
 
-        try {
+     //   try {
 
             log.trace("\tObjectbean:" + objectBean)
 
 
             attributeValueMap.clone().each { Map.Entry map ->
 
-                if (map.value == null || map.value == []) {
-                    clearObjectAttribute(objectBean, map.key)
-                } else {
-
-                    MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
-
-
-                    MutableObjectAttributeBean newAttributeBean
-                    if (map.value instanceof ArrayList) {
-                        //make sure everything is a string
-
-                        if (map.value.first() instanceof ObjectBean) {
-                            map.value = map.value.collect { it.id.toString() }
-                        } else {
-                            map.value = map.value.collect { it.toString() }
-                        }
-
-
-                        newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, *map.value)
-
+                log.trace("\t\tUpdating attribute ${Map.Entry}, - ${map.value}" )
+                try {
+                    if (map.value == null || map.value == []) {
+                        clearObjectAttribute(objectBean, map.key)
                     } else {
 
-                        if (map.value instanceof ObjectBean) {
-                            map.value = map.value.id
-                        }
-
-                        newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, map.value as String)
-                    }
+                        MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
 
 
-                    ObjectAttributeBean oldAttributeBean = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id)
-                    def oldValue = oldAttributeBean.getObjectAttributeValueBeans()[0].value
-                    log.trace("OLD value: $oldValue, New Value: ${map.value}")
-                    if (map.value.find().toString() == oldValue.toString()) {
-                        log.info("New attribute value is same as old.")
-                        return
-                    }
+                        MutableObjectAttributeBean newAttributeBean
+                        if (map.value instanceof ArrayList) {
+                            //make sure everything is a string
 
-                    // If attribute exist reuse the old id for the new attribute
-                    if (oldAttributeBean != null) {
-                        newAttributeBean.setId(oldAttributeBean.id)
-                    }
+                            if (map.value.first() instanceof ObjectBean) {
+                                map.value = map.value.collect { it.id.toString() }
+                            } else {
+                                map.value = map.value.collect { it.toString() }
+                            }
 
-                    if (readOnly) {
-                        log.info("Attribute not updated, currently in read only mode")
-                        return null
-                    } else {
 
-                           ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
-                           
-
-                        if (newAttributeBean != null) {
-                            newObjectAttributeBeans.add(newObjectAttributeBean)
-                            log.info("Successfully updated attribute")
+                            newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, *map.value)
 
                         } else {
-                            log.error("Failed to update attribute")
-                            throw new RuntimeException("Failed to update Object (${objectBean.objectKey}) attribute: ${map.key} with value: ${map.value}")
 
+                            if (map.value instanceof ObjectBean) {
+                                map.value = map.value.id
+                            }
+
+                            newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, map.value as String)
+                        }
+
+
+                        ObjectAttributeBean oldAttributeBean = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id)
+                        def oldValue = oldAttributeBean.getObjectAttributeValueBeans()[0].value
+                        log.trace("OLD value: $oldValue, New Value: ${map.value}")
+                        if (map.value.find().toString() == oldValue.toString()) {
+                            log.info("New attribute value is same as old.")
+                            return
+                        }
+
+                        // If attribute exist reuse the old id for the new attribute
+                        if (oldAttributeBean != null) {
+                            newAttributeBean.setId(oldAttributeBean.id)
+                        }
+
+                        if (readOnly) {
+                            log.info("Attribute not updated, currently in read only mode")
+                            return null
+                        } else {
+
+                            ObjectAttributeBean newObjectAttributeBean = objectFacade.storeObjectAttributeBean(newAttributeBean, this.eventDispatchOption)
+
+
+                            if (newAttributeBean != null) {
+                                newObjectAttributeBeans.add(newObjectAttributeBean)
+                                log.info("Successfully updated attribute")
+
+                            } else {
+                                log.error("Failed to update attribute")
+                                throw new RuntimeException("Failed to update Object (${objectBean.objectKey}) attribute: ${map.key} with value: ${map.value}")
+
+                            }
                         }
                     }
+
+                } catch (all) {
+                    log.error("\tError updating object attribute:" + all.message)
+                    log.error("\tTried updating object:" + object)
+                    log.error("\tWith attributes:" + attributeValueMap)
+                    logRelevantStacktrace(all.stackTrace)
+                    throw all
+
                 }
-
-
             }
 
 
-        } catch (all) {
-            log.error("\tError updating object attribute:" + all.message)
-            log.error("\tTried updating object:" + object)
-            log.error("\tWith attributes:" + attributeValueMap)
-            logRelevantStacktrace(all.stackTrace)
-            throw all
 
-        }
 
 
         return newObjectAttributeBeans
