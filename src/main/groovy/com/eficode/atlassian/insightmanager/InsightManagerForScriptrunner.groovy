@@ -683,6 +683,7 @@ class InsightManagerForScriptrunner {
 
         ObjectBean objectBean = getObjectBean(object)
 
+
         ArrayList<ObjectAttributeBean> newObjectAttributeBeans = []
 
         try {
@@ -690,13 +691,18 @@ class InsightManagerForScriptrunner {
             log.trace("\tObjectbean:" + objectBean)
 
 
-            attributeValueMap.each { Map.Entry map ->
+            attributeValueMap.clone().each { Map.Entry map ->
+                MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
+                def oldValue = objectFacade.loadObjectAttributeBean(objectBean.id, objectTypeAttributeBean.id).getObjectAttributeValueBeans()[0].value
+                log.info("OLD value: $oldValue, New Value: ${map.value}")
                 if (map.value == null || map.value == []) {
                     clearObjectAttribute(objectBean, map.key)
+                } else if (map.value == oldValue) {
+                    log.info("New attribute value is same as old.")
+                    return
                 } else {
 
-                    MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
-
+                    //MutableObjectTypeAttributeBean objectTypeAttributeBean = getObjectTypeAttributeBean(map.key, objectBean.objectTypeId).createMutable()
 
                     MutableObjectAttributeBean newAttributeBean
                     if (map.value instanceof ArrayList) {
@@ -709,7 +715,6 @@ class InsightManagerForScriptrunner {
                         }
 
                         newAttributeBean = objectAttributeBeanFactory.createObjectAttributeBeanForObject(objectBean, objectTypeAttributeBean, *map.value)
-
 
                     } else {
 
